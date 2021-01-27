@@ -45,9 +45,9 @@ public class StreamWordCount {
 
         // 基于数据流进行转换计算
         DataStream<Tuple2<String, Integer>> resultStream = inputDataStream.flatMap(new WordCount.MyFlatMapper())//.slotSharingGroup("green")
-                 .keyBy(new KeySelector<Tuple2<String, Integer>, Object>() {
+                 .keyBy(new KeySelector<Tuple2<String, Integer>, String>() {
                     @Override
-                    public Object getKey(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
+                    public String getKey(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
                         return stringIntegerTuple2.f0;
                     }
                 })
