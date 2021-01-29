@@ -10,15 +10,14 @@ package net.nanquanyuhao.apitest.window;/**
 
 import net.nanquanyuhao.apitest.beans.SensorReading;
 import org.apache.commons.collections.IteratorUtils;
-import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.AggregateFunction;
-import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
@@ -36,18 +35,16 @@ public class WindowTest1_TimeWindow {
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        // 重启策略为固定延时重启，如果发生故障，系统会尝试重新启动作业5次，并在连续重启尝试之间等待50秒
-        // env.setRestartStrategy(RestartStrategies.fixedDelayRestart(5, 50000L));
         env.setParallelism(1);
 
-//        // 从文件读取数据
-        DataStream<String> inputStream = env.readTextFile("D:\\code\\job\\FlinkTutorial\\src\\main\\resources\\sensor.txt");
+        // 从文件读取数据
+        // DataStream<String> inputStream = env.readTextFile("F:\\GitHub\\FlinkTutorial\\src\\main\\resources\\sensor.txt");
 
         // socket文本流
-        // DataStream<String> inputStream = env.socketTextStream("192.168.235.101", 7777);
+        DataStream<String> inputStream = env.socketTextStream("192.168.235.101", 7777);
 
         // 转换成SensorReading类型
-        DataStream<SensorReading> dataStream = inputStream.assignTimestampsAndWatermarks(new WatermarkStrategy<SensorReading>()).map(line -> {
+        DataStream<SensorReading> dataStream = inputStream.map(line -> {
             String[] fields = line.split(",");
             return new SensorReading(fields[0], new Long(fields[1]), new Double(fields[2]));
         });
@@ -63,9 +60,8 @@ public class WindowTest1_TimeWindow {
         })
 //                .countWindow(10, 2);
 //                .window(EventTimeSessionWindows.withGap(Time.minutes(1)));
-//                .window(TumblingProcessingTimeWindows.of(Time.seconds(15)))
                 // 滚动时间窗口 15s
-                .timeWindow(Time.seconds(15))
+                .window(TumblingProcessingTimeWindows.of(Time.seconds(15)))
                 .aggregate(new AggregateFunction<SensorReading, Integer, Integer>() {
 
                     // 创建累加器
@@ -93,29 +89,28 @@ public class WindowTest1_TimeWindow {
                     }
                 });
 
-        resultStream.print();
 
         // 2. 全窗口函数
-        /*SingleOutputStreamOperator<Tuple3<String, Long, Integer>> resultStream2 = dataStream.keyBy(new KeySelector<SensorReading, String>() {
+        SingleOutputStreamOperator<Tuple3<String, Long, Integer>> resultStream2 = dataStream.keyBy(new KeySelector<SensorReading, String>() {
 
             @Override
             public String getKey(SensorReading sensorReading) throws Exception {
                 return sensorReading.getId();
             }
         })
-                .timeWindow(Time.seconds(15))*/
+                .window(TumblingProcessingTimeWindows.of(Time.seconds(15)))
 //                .process(new ProcessWindowFunction<SensorReading, Object, Tuple, TimeWindow>() {
 //                })
-                /*.apply(new WindowFunction<SensorReading, Tuple3<String, Long, Integer>, String, TimeWindow>() {
+                .apply(new WindowFunction<SensorReading, Tuple3<String, Long, Integer>, String, TimeWindow>() {
 
-                    *//**
+                    /**
                      *
                      * @param s 分组的 key
                      * @param window
                      * @param input
                      * @param out
                      * @throws Exception
-                     *//*
+                     */
                     @Override
                     public void apply(String s, TimeWindow window, Iterable<SensorReading> input, Collector<Tuple3<String, Long, Integer>> out) throws Exception {
                         String id = s;
@@ -124,9 +119,9 @@ public class WindowTest1_TimeWindow {
                         out.collect(new Tuple3<>(id, windowEnd, count));
                     }
                 });
-*/
+
         // 3. 其它可选API
-        /*OutputTag<SensorReading> outputTag = new OutputTag<SensorReading>("late") {
+        OutputTag<SensorReading> outputTag = new OutputTag<SensorReading>("late") {
         };
 
         SingleOutputStreamOperator<SensorReading> sumStream = dataStream.keyBy(new KeySelector<SensorReading, String>() {
@@ -135,8 +130,7 @@ public class WindowTest1_TimeWindow {
             public String getKey(SensorReading sensorReading) throws Exception {
                 return sensorReading.getId();
             }
-        })
-                .timeWindow(Time.seconds(15))
+        }).window(TumblingProcessingTimeWindows.of(Time.seconds(15)))
 //                .trigger()
 //                .evictor()
                 // 允许迟到的数据时间，只针对事件时间语义下有效
@@ -145,9 +139,9 @@ public class WindowTest1_TimeWindow {
                 .sideOutputLateData(outputTag)
                 .sum("temperature");
 
-        // sumStream.getSideOutput(outputTag).print("late");
-        // resultStream2.print();
-*/
+        sumStream.getSideOutput(outputTag).print("late");
+        resultStream2.print();
+
         env.execute();
     }
 }
