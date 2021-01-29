@@ -18,7 +18,9 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  * @Version: 1.0
  */
 public class SourceTest2_File {
+
     public static void main(String[] args) throws Exception {
+
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
