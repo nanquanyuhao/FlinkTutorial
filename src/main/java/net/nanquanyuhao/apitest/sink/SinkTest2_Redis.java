@@ -11,11 +11,11 @@ package net.nanquanyuhao.apitest.sink;/**
 import net.nanquanyuhao.apitest.beans.SensorReading;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-/*import org.apache.flink.streaming.connectors.redis.RedisSink;
+import org.apache.flink.streaming.connectors.redis.RedisSink;
 import org.apache.flink.streaming.connectors.redis.common.config.FlinkJedisPoolConfig;
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisCommand;
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisCommandDescription;
-import org.apache.flink.streaming.connectors.redis.common.mapper.RedisMapper;*/
+import org.apache.flink.streaming.connectors.redis.common.mapper.RedisMapper;
 
 /**
  * @ClassName: SinkTest2_Redis
@@ -23,7 +23,7 @@ import org.apache.flink.streaming.connectors.redis.common.mapper.RedisMapper;*/
  * @Author: wushengran on 2020/11/9 10:42
  * @Version: 1.0
  */
-/*public class SinkTest2_Redis {
+public class SinkTest2_Redis {
 
     public static void main(String[] args) throws Exception {
 
@@ -45,13 +45,13 @@ import org.apache.flink.streaming.connectors.redis.common.mapper.RedisMapper;*/
                 .setPort(6379)
                 .build();
 
-        dataStream.addSink( new RedisSink<>(config, new MyRedisMapper()));
+        dataStream.addSink(new RedisSink<>(config, new MyRedisMapper()));
 
         env.execute();
     }
 
     // 自定义RedisMapper
-    public static class MyRedisMapper implements RedisMapper<SensorReading>{
+    public static class MyRedisMapper implements RedisMapper<SensorReading> {
         // 定义保存数据到redis的命令，存成Hash表，hset sensor_temp id temperature
         @Override
         public RedisCommandDescription getCommandDescription() {
@@ -68,4 +68,4 @@ import org.apache.flink.streaming.connectors.redis.common.mapper.RedisMapper;*/
             return data.getTemperature().toString();
         }
     }
-}*/
+}
