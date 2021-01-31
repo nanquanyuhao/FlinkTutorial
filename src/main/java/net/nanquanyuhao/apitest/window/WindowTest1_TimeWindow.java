@@ -17,6 +17,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
@@ -130,7 +131,9 @@ public class WindowTest1_TimeWindow {
             public String getKey(SensorReading sensorReading) throws Exception {
                 return sensorReading.getId();
             }
-        }).window(TumblingProcessingTimeWindows.of(Time.seconds(15)))
+        })
+                // allowedLateness就是针对 event time 而言
+                .window(TumblingEventTimeWindows.of(Time.seconds(15)))
 //                .trigger()
 //                .evictor()
                 // 允许迟到的数据时间，只针对事件时间语义下有效
