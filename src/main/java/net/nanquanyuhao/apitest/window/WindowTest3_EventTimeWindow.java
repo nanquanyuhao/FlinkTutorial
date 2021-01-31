@@ -29,7 +29,7 @@ public class WindowTest3_EventTimeWindow {
     public static void main(String[] args) throws Exception {
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(1);
+        // env.setParallelism(1);
 
         // 默认就是事件时间，1.10.1 的版本还是处理时间为默认时间
         // env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
