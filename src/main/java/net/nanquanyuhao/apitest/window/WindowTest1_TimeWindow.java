@@ -25,6 +25,8 @@ import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
 
 /**
+ * window 均为基于窗口内数据进行计算，有状态
+ *
  * @ClassName: WindowTest1_TimeWindow
  * @Description:
  * @Author: wushengran on 2020/11/9 14:37

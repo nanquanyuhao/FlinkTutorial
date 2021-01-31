@@ -16,6 +16,8 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
 
 /**
+ * 基本转换算子（简单），来一个直接输出处理，无状态
+ *
  * @ClassName: TransformTest1_Base
  * @Description:
  * @Author: wushengran on 2020/11/7 14:28

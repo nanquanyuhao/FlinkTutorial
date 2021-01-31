@@ -11,13 +11,14 @@ package net.nanquanyuhao.apitest.transform;/**
 import net.nanquanyuhao.apitest.beans.SensorReading;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 /**
+ * 复杂操作，有状态
+ *
  * @ClassName: TransformTest3_Reduce
  * @Description:
  * @Author: wushengran on 2020/11/7 15:39
