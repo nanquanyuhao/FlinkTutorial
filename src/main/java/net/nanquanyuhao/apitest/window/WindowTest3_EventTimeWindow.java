@@ -9,14 +9,17 @@ package net.nanquanyuhao.apitest.window;/**
  */
 
 import net.nanquanyuhao.apitest.beans.SensorReading;
+import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.OutputTag;
+
+import java.time.Duration;
 
 /**
  * @ClassName: WindowTest3_EventTimeWindow
@@ -29,7 +32,7 @@ public class WindowTest3_EventTimeWindow {
     public static void main(String[] args) throws Exception {
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        // env.setParallelism(1);
+        env.setParallelism(1);
 
         // 默认就是事件时间，1.10.1 的版本还是处理时间为默认时间
         // env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
@@ -55,14 +58,14 @@ public class WindowTest3_EventTimeWindow {
                 // 乱序数据设置时间戳和watermark
                 .assignTimestampsAndWatermarks(
                         // Watermarks 延时时间为 2s
-                        new BoundedOutOfOrdernessTimestampExtractor<SensorReading>(Time.seconds(2)) {
-
-                            @Override
-                            public long extractTimestamp(SensorReading element) {
-                                // ms 数返回的时间戳
-                                return element.getTimestamp() * 1000L;
-                            }
-                        });
+                        WatermarkStrategy.<SensorReading>forBoundedOutOfOrderness(Duration.ofSeconds(2))
+                                .withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
+                                    @Override
+                                    public long extractTimestamp(SensorReading var1, long var2) {
+                                        // ms 数返回的时间戳
+                                        return var1.getTimestamp() * 1000L;
+                                    }
+                                }));
 
         OutputTag<SensorReading> outputTag = new OutputTag<SensorReading>("late") {
         };
