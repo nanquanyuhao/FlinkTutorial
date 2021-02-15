@@ -20,6 +20,7 @@
             <version>1.12.1</version>
         </dependency>
 
+        <!-- Flink1.11开始，移除了flink-streaming-java对flink-clients的依赖，需要额外加 -->
         <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-clients -->
         <dependency>
             <groupId>org.apache.flink</groupId>
